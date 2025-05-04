@@ -41,7 +41,7 @@
       value="3"
       step="0.5" 
       style="width: 256px;"/>
-      <input type="number" id="stars_size_val" name="stars_size_val" style="width: 40px;">
+      <input type="number" id="stars_size_val" name="stars_size_val" style="width: 40px;" disabled>
     </div>
     <label for="stars_density">Variability</label>
     <div class="row">
@@ -54,7 +54,16 @@
       value="0.5"
       step="0.05" 
       style="width: 256px;"/>
-      <input type="number" id="stars_variability_val" name="stars_variability_val" style="width: 40px;">
+      <input type="number" id="stars_variability_val" name="stars_variability_val" style="width: 40px;" disabled>
+    </div>
+    <label for="stars_color1">Color(s)</label>
+    <div class="col">
+      <input type="color" id="stars_color1" name="stars_color1" value="#ffffff">
+      <div class="row">
+      <label for="stars_useColor2">Use Secondary Color?</label>
+      <input type="checkbox" id="stars_useColor2" name="stars_useColor2">
+      </div>
+      <input type="color" id="stars_color2" name="stars_color2" value="#00ffff" disabled>
     </div>
   </div>
 </div>
