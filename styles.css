@@ -1,0 +1,30 @@
+html {
+   background-color: rgb(73, 73, 73);
+   color: white;
+}
+
+.row {
+   display: flex;
+   flex-direction: row;
+}
+
+.col {
+   display: flex;
+   flex-direction: column;
+}
+
+#cnvs {
+   width: 512px;
+   height: 512px;
+   padding: 10px;
+   image-rendering: pixelated; /* Modern browsers */
+   image-rendering: crisp-edges; /* Firefox */
+   image-rendering: -webkit-optimize-contrast; /* Safari and older Chrome versions */
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}

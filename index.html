@@ -1,12 +1,64 @@
 <!DOCTYPE html>
 <html>
 <head>
+<link rel="stylesheet" href="styles.css">
 <script src='http://joeiddon.github.io/perlin/perlin.js'></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 </head>
 <body>
 <h1>Hello World</h1>
 <p>I'm hosted with GitHub Pages.</p>
-<canvas id="cnvs" width="1000" height="1000" style="border:1px solid black;"></canvas>
+<div class="row">
+  <canvas id="cnvs" width="512" height="512"></canvas>
+  <div class="col"><h1>Stars</h1>
+    <label for="stars_density">Density</label>
+    <div class="row">
+    <input
+      type="range"
+      id="stars_density"
+      name="stars_density"
+      min="0"
+      max="2.5"
+      value="0.5"
+      step="0.025" 
+      style="width: 256px;"/>
+      <input type="number" id="stars_density_val" name="stars_density_val" style="width: 40px;" disabled>
+    </div>
+    <label for="stars_shape">Shape</label>
+    <select id="stars_shape" name="stars_shape">
+      <option value="circle">Circle</option>
+      <option value="square">Square</option>
+      <option value="4-prong">Cross</option>
+    </select>
+    <label for="stars_density">Size</label>
+    <div class="row">
+    <input
+      type="range"
+      id="stars_size"
+      name="stars_size"
+      min="1"
+      max="10"
+      value="3"
+      step="0.5" 
+      style="width: 256px;"/>
+      <input type="number" id="stars_size_val" name="stars_size_val" style="width: 40px;">
+    </div>
+    <label for="stars_density">Variability</label>
+    <div class="row">
+    <input
+      type="range"
+      id="stars_variability"
+      name="stars_variability"
+      min="0"
+      max="1"
+      value="0.5"
+      step="0.05" 
+      style="width: 256px;"/>
+      <input type="number" id="stars_variability_val" name="stars_variability_val" style="width: 40px;">
+    </div>
+  </div>
+</div>
+
 <script src="util.js"></script>
 </body>
 </html>
