@@ -30,6 +30,20 @@
       <option value="square">Square</option>
       <option value="4-prong">Cross</option>
     </select>
+    <label for="stars_tail" id="stars_tail_label" hidden>Glint Length</label>
+    <div class="row">
+    <input
+      type="range"
+      id="stars_tail"
+      name="stars_tail"
+      min="10"
+      max="100"
+      value="10"
+      step="5" 
+      style="width: 256px;"
+      hidden />
+      <input type="number" id="stars_tail_val" name="stars_tail_val" style="width: 40px;" disabled hidden>
+    </div>
     <label for="stars_density">Size</label>
     <div class="row">
     <input

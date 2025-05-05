@@ -39,38 +39,12 @@ function randomColorBetween(c1r,c1g,c1b,c2r,c2g,c2b, isEnabled) {
       c2r = parseInt(c2r);
       c2g = parseInt(c2g);
       c2b = parseInt(c2b);
-   // 1. Difference between c1 and c2 values
-      r_diff = Math.abs(c1r-c2r);
-      g_diff = Math.abs(c1g-c2g);
-      b_diff = Math.abs(c1b-c2b);
    // 2. Generate a random number between 0 and 1
       let rand = Math.random();
    // 3. Multiply rand to each diff
-      r_diff = r_diff * rand;
-      g_diff = g_diff * rand;
-      b_diff = b_diff * rand;
-   // 4. Add to lower value
-      r = 0
-      g = 0
-      b = 0
-      if(c1r < c2r) {
-         r = c1r + r_diff;
-      }
-      else {
-         r = c2r + r_diff;
-      }
-      if(c1g < c2g) {
-         g = c1g + g_diff;
-      }
-      else {
-         g = c2g + g_diff;
-      }
-      if(c1b < c2b) {
-         b = c1b + b_diff;
-      }
-      else {
-         b = c2b + b_diff;
-      }
+      let r = c1r + rand*(c2r - c1r);
+      let g = c1g + rand*(c2g - c1g);
+      let b = c1b + rand*(c2b - c1b);
       return [r,g,b];
    }
    else {
@@ -100,10 +74,9 @@ function perlinNoise(scale = 5) {
          );
       }
    }
-   console.log("Hello, world!"); // Prints "Hello, world!" to the console
  }
 
- function drawPixel(x, y, c1, c2, a, shape, scale, variability, isEnabled) {
+ function drawPixel(x, y, c1, c2, a, shape, scale, variability, isEnabled,stars_tail_val) {
    let rgbArr = randomColorBetween(c1[0],c1[1],c1[2],c2[0],c2[1],c2[2],isEnabled);
    let color = 'rgba('+rgbArr[0]+','+rgbArr[1]+','+rgbArr[2]+','+a+')';
    ctx.fillStyle = color;
@@ -125,25 +98,15 @@ function perlinNoise(scale = 5) {
    else if(shape == "4-prong") {
       let alpha = 0;
       rand = rand*(scale/4);
-      for(let i = x-10; i < x+10; ++i) {
+      for(let i = x-parseInt(stars_tail_val); i < x+parseInt(stars_tail_val); ++i) {
          ctx.fillStyle = 'rgba('+rgbArr[0]+','+rgbArr[1]+','+rgbArr[2]+','+alpha+')';
-         if(i < x) {
-            alpha = alpha + 0.1; 
-          }
-          else {
-            alpha = alpha - 0.1;
-          }
+         alpha = ( (-1) * Math.abs(i-x) + parseInt(stars_tail_val)) / parseInt(stars_tail_val);
          ctx.fillRect(i, y, rand, rand);
       }
       alpha = 0;
-      for(let j = y-10; j < y+10; ++j) {
+      for(let j = y-parseInt(stars_tail_val); j < y+parseInt(stars_tail_val); ++j) {
          ctx.fillStyle = 'rgba('+rgbArr[0]+','+rgbArr[1]+','+rgbArr[2]+','+alpha+')';
-         if(j < y) {
-            alpha = alpha + 0.1; 
-          }
-          else {
-            alpha = alpha - 0.1;
-          }
+         alpha = ( (-1) * Math.abs(j-y) + parseInt(stars_tail_val)) / parseInt(stars_tail_val);
          ctx.fillRect(x, j, rand, rand);
       }
       ctx.fillStyle = 'white';
@@ -151,13 +114,13 @@ function perlinNoise(scale = 5) {
    }
  }
 
- function stars(density = 0.025, shape = "circle", scale = 3, variability = 1, color1 = [255,255,255], color2 = [0,0,0], isEnabled = false) {
+ function stars(density = 0.025, shape = "circle", scale = 3, variability = 1, color1 = [255,255,255], color2 = [0,0,0], isEnabled = false, stars_tail_val = 10) {
    for (let y = 0; y < cnvs.height; y += 1){
       for (let x = 0; x < cnvs.width; x += 1){
          let rand = Math.random();
          let br = Math.floor(Math.random()*255);
          if(rand < density/100) {
-            drawPixel(x,y,color1,color2,br,shape,scale,variability,isEnabled);
+            drawPixel(x,y,color1,color2,br,shape,scale,variability,isEnabled,stars_tail_val);
             
          }
       }
@@ -190,18 +153,20 @@ stars_color2 = document.getElementById("stars_color2");
 stars_color2_val = hexToRgb(stars_color2.value);
 stars_useColor2 = null;
 stars_useColor2_val = null;
+stars_tail = null;
+stars_tail_val = null;
 
 
 stars_density = document.getElementById("stars_density");
 stars_density_val = stars_density.value;
 perlinNoise();
-stars(stars_density_val,stars_shape_val, stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val);
+stars(stars_density_val,stars_shape_val, stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val);
 gradient();
 $('#stars_density_val').val(stars_density_val);
 stars_density.addEventListener("change", function(event) {
    stars_density_val = event.target.value;
    perlinNoise();
-   stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val);
+   stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val);
    gradient();
    $('#stars_density_val').val(stars_density_val);
  });
@@ -210,12 +175,22 @@ stars_density.addEventListener("change", function(event) {
 stars_shape = document.getElementById("stars_shape");
 stars_shape_val = stars_shape.value;
 perlinNoise();
-stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val);
+stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val);
 gradient();
 stars_shape.addEventListener("change", function(event) {
    stars_shape_val = event.target.value;
+   if(stars_shape_val == "4-prong") {
+      $('#stars_tail').removeAttr('hidden');
+      $('#stars_tail_label').removeAttr('hidden');
+      $('#stars_tail_val').removeAttr('hidden'); 
+   }
+   else {
+      $('#stars_tail').attr('hidden',true);
+      $('#stars_tail_label').attr('hidden',true);
+      $('#stars_tail_val').attr('hidden',true);
+   }
    perlinNoise();
-   stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val);
+   stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val);
    gradient();
  });
 
@@ -223,13 +198,13 @@ stars_shape.addEventListener("change", function(event) {
 stars_size = document.getElementById("stars_size");
 stars_size_val = stars_size.value;
 perlinNoise();
-stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val);
+stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val);
 gradient();
 $('#stars_size_val').val(stars_size_val);
 stars_size.addEventListener("change", function(event) {
    stars_size_val = event.target.value;
    perlinNoise();
-   stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val);
+   stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val);
    gradient();
    $('#stars_size_val').val(stars_size_val);
  });
@@ -238,13 +213,13 @@ stars_size.addEventListener("change", function(event) {
 stars_variability = document.getElementById("stars_variability");
 stars_variability_val = stars_variability.value;
 perlinNoise();
-stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val);
+stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val);
 gradient();
 $('#stars_variability_val').val(stars_variability_val);
 stars_variability.addEventListener("change", function(event) {
    stars_variability_val = event.target.value;
    perlinNoise();
-   stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val);
+   stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val);
    gradient();
    $('#stars_variability_val').val(stars_variability_val);
  });
@@ -252,23 +227,23 @@ stars_variability.addEventListener("change", function(event) {
 
 
 perlinNoise();
-stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val);
+stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val);
 gradient();
 stars_color1.addEventListener("change", function(event) {
    stars_color1_val = hexToRgb(event.target.value);
    perlinNoise();
-   stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val);
+   stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val);
    gradient();
 });
 
 
 perlinNoise();
-stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val);
+stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val);
 gradient();
 stars_color2.addEventListener("change", function(event) {
    stars_color2_val = hexToRgb(event.target.value);
    perlinNoise();
-   stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val);
+   stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val);
    gradient();
 });
 
@@ -276,7 +251,7 @@ stars_color2.addEventListener("change", function(event) {
 stars_useColor2 = document.getElementById("stars_useColor2");
 stars_useColor2_val = stars_useColor2.checked;
 perlinNoise();
-stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val);
+stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val);
 gradient();
 stars_useColor2.addEventListener("change", function(event) {
    stars_useColor2_val = event.target.checked;
@@ -287,6 +262,21 @@ stars_useColor2.addEventListener("change", function(event) {
       $('#stars_color2').attr('disabled',true);
    }
    perlinNoise();
-   stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val);
+   stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val);
    gradient();
 });
+
+
+stars_tail = document.getElementById("stars_tail");
+stars_tail_val = stars_tail.value;
+perlinNoise();
+stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val);
+gradient();
+$('#stars_tail_val').val(stars_tail_val);
+stars_tail.addEventListener("change", function(event) {
+   stars_tail_val = event.target.value;
+   perlinNoise();
+   stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val);
+   gradient();
+   $('#stars_tail_val').val(stars_tail_val);
+ });
