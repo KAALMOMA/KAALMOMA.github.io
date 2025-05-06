@@ -1,5 +1,5 @@
 let cnvs = document.getElementById('cnvs');
-let ctx = cnvs.getContext('2d');
+let ctx = cnvs.getContext('2d', { willReadFrequently: true });
 
 function hexToRgb(hex) {
    // Remove the '#' if it exists
@@ -52,10 +52,105 @@ function randomColorBetween(c1r,c1g,c1b,c2r,c2g,c2b, isEnabled) {
    }
 }
 
-function perlinNoise(scale = 5) {
+
+
+
+
+
+
+
+function gaussian1D(sigma, kernelSize) {
+   const kernel = [];
+   const center = Math.floor(kernelSize / 2);
+   let sum = 0;
+ 
+   for (let i = 0; i < kernelSize; i++) {
+     const x = i - center;
+     const value = Math.exp(-(x * x) / (2 * sigma * sigma));
+     kernel[i] = value;
+     sum += value;
+   }
+ 
+   // Normalize kernel
+   return kernel.map(v => v / sum);
+ }
+ 
+ function blur1D(data, width, height, kernel, horizontal = true) {
+   const output = new Uint8ClampedArray(data.length);
+   const half = Math.floor(kernel.length / 2);
+ 
+   for (let y = 0; y < height; y++) {
+     for (let x = 0; x < width; x++) {
+       let r = 0, g = 0, b = 0, a = 0;
+       for (let k = -half; k <= half; k++) {
+         const offsetX = horizontal ? x + k : x;
+         const offsetY = horizontal ? y : y + k;
+         const clampedX = Math.max(0, Math.min(width - 1, offsetX));
+         const clampedY = Math.max(0, Math.min(height - 1, offsetY));
+         const offset = (clampedY * width + clampedX) * 4;
+         const weight = kernel[k + half];
+         r += data[offset] * weight;
+         g += data[offset + 1] * weight;
+         b += data[offset + 2] * weight;
+         a += data[offset + 3] * weight;
+       }
+       const i = (y * width + x) * 4;
+       output[i] = r;
+       output[i + 1] = g;
+       output[i + 2] = b;
+       output[i + 3] = a;
+     }
+   }
+ 
+   return output;
+ }
+ 
+ function applySeparableGaussianBlur(imageData, width, height, sigma = 2.0) {
+   const kernelSize = Math.ceil(sigma * 6) | 1; // make odd
+   const kernel = gaussian1D(sigma, kernelSize);
+   const pixels = imageData.data;
+   const horizBlurred = blur1D(pixels, width, height, kernel, true);
+   const vertBlurred = blur1D(horizBlurred, width, height, kernel, false);
+ 
+   // Copy result back
+   for (let i = 0; i < pixels.length; i++) {
+     pixels[i] = vertBlurred[i];
+   }
+ 
+   return imageData;
+ }
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+function fillBackground(c1,c2,isEnabled = false) {
+   const gradient = ctx.createLinearGradient(0, 0, 0, 512);
+   if(isEnabled) {
+      gradient.addColorStop(0, "rgb("+c1[0]+","+c1[1]+","+c1[2]+")");
+      gradient.addColorStop(1, "rgb("+c2[0]+","+c2[1]+","+c2[2]+")");
+      ctx.fillStyle = gradient;
+   } else {
+      ctx.fillStyle = "rgb("+c1[0]+","+c1[1]+","+c1[2]+")";
+   }
+   ctx.fillRect(0, 0, 512, 512);
+}
+
+function perlinNoise(scale = 5, contrast = 80, color = 'hsla(240,50%,50%,1)') {
+   fillBackground("rgb(0,0,0)");
+   if(false) {
    const GRID_SIZE = scale;
    const RESOLUTION = 80;
-   const COLOR_SCALE = 60;
+   const COLOR_SCALE = contrast;
 
    let pixel_size = cnvs.width / RESOLUTION;
    let num_pixels = GRID_SIZE / RESOLUTION;
@@ -74,6 +169,36 @@ function perlinNoise(scale = 5) {
          );
       }
    }
+   }
+ }
+
+ function nebulas(c1 = [255,0,0], c2 = [0,0,255], max = 30, blur = 30, density = 4, isEnabled = false) {
+   density = density/10000;
+   rgbArr = randomColorBetween(c1[0],c1[1],c1[2],c2[0],c2[1],c2[2],isEnabled);
+   let color = "rgb("+rgbArr[0]+","+rgbArr[1]+","+rgbArr[2]+")";
+   ctx.fillStyle = color;
+      for(let x = 0; x < cnvs.width; ++x) {
+         for(let y = 0; y < cnvs.height; ++y) {
+            rgbArr = randomColorBetween(c1[0],c1[1],c1[2],c2[0],c2[1],c2[2],isEnabled);
+            color = "rgb("+rgbArr[0]+","+rgbArr[1]+","+rgbArr[2]+")";
+            ctx.fillStyle = color;
+            let randomNum = Math.random();
+            if(randomNum < density) {
+               let rand = randomInRange(0,max);
+               ctx.beginPath();
+               ctx.arc(x, y, rand, 0, 2 * Math.PI);
+               ctx.fill();
+               //console.log("TEST >> "+alph);
+            }
+         }
+      }
+      if (Math.floor(max) == 0 || density == 0) {
+         return;   
+      } else {
+         let imageData = ctx.getImageData(0, 0, cnvs.width, cnvs.height);
+         let blurred = applySeparableGaussianBlur(imageData, cnvs.width, cnvs.height, blur);
+         ctx.putImageData(blurred, 0, 0);
+      }
  }
 
  function drawPixel(x, y, c1, c2, a, shape, scale, variability, isEnabled, stars_tail_val, whiteCenter) {
@@ -126,7 +251,7 @@ function perlinNoise(scale = 5) {
       ctx.arc(x, y, rand, 0, 2 * Math.PI);
       ctx.fill();
       if(whiteCenter) {
-         let br = Math.max(a*2,255);
+         let br = Math.max(a*4,255);
          let white = 'rgba('+255+','+255+','+255+','+br+')';
          ctx.fillStyle = white;
          ctx.beginPath();
@@ -167,6 +292,7 @@ function perlinNoise(scale = 5) {
  }
 
  function stars(density = 0.025, shape = "circle", scale = 3, variability = 1, color1 = [255,255,255], color2 = [0,0,0], isEnabled = false, stars_tail_val = 10, whiteCenter = false) {
+   if(true) {
    for (let y = 0; y < cnvs.height; y += 1){
       for (let x = 0; x < cnvs.width; x += 1){
          let rand = Math.random();
@@ -176,6 +302,7 @@ function perlinNoise(scale = 5) {
          }
       }
    }
+   }
  }
 
  function gradient() {
@@ -184,6 +311,12 @@ function perlinNoise(scale = 5) {
    grad.addColorStop(1, "rgba(20,30,255,5%)");
    ctx.fillStyle = grad;
    ctx.fillRect(0,0,512,512);
+ }
+
+ function generateGalaxy() {
+   fillBackground(bg_color1_val,bg_color2_val,bg_useColor2_val);
+   nebulas(neb_color1_val,neb_color2_val,neb_size_val,neb_blur_val,neb_density_val,neb_useColor2_val);
+   stars(stars_density_val,stars_shape_val, stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val,stars_white_val);
  }
 
 stars_density = null;
@@ -208,27 +341,37 @@ stars_tail = null;
 stars_tail_val = null;
 stars_white = null;
 stars_white_val = null;
+neb_size = null;
+neb_size_val = null;
+neb_blur = null;
+neb_blur_val = null;
+neb_density = null;
+neb_density_val = null;
+neb_color1 = document.getElementById("neb_color1");
+neb_color1_val = hexToRgb(neb_color1.value);
+neb_color2 = document.getElementById("neb_color2");
+neb_color2_val = hexToRgb(neb_color2.value);
+neb_useColor2 = null;
+neb_useColor2_val = null;
+bg_color1 = document.getElementById("bg_color1");
+bg_color1_val = hexToRgb(bg_color1.value);
+bg_color2 = document.getElementById("bg_color2");
+bg_color2_val = hexToRgb(bg_color2.value);
+bg_useColor2 = null;
+bg_useColor2_val = null;
 
 stars_density = document.getElementById("stars_density");
 stars_density_val = stars_density.value;
-perlinNoise();
-stars(stars_density_val,stars_shape_val, stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val,stars_white_val);
-gradient();
 $('#stars_density_val').val(stars_density_val);
 stars_density.addEventListener("change", function(event) {
    stars_density_val = event.target.value;
-   perlinNoise();
-   stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val,stars_white_val);
-   gradient();
+   generateGalaxy();
    $('#stars_density_val').val(stars_density_val);
  });
 
 
 stars_shape = document.getElementById("stars_shape");
 stars_shape_val = stars_shape.value;
-perlinNoise();
-stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val,stars_white_val);
-gradient();
 stars_shape.addEventListener("change", function(event) {
    stars_shape_val = event.target.value;
    if(stars_shape_val == "4-prong") {
@@ -241,70 +384,44 @@ stars_shape.addEventListener("change", function(event) {
       $('#stars_tail_label').attr('hidden',true);
       $('#stars_tail_val').attr('hidden',true);
    }
-   perlinNoise();
-   stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val,stars_white_val);
-   gradient();
+   generateGalaxy()
  });
 
 
 stars_size = document.getElementById("stars_size");
 stars_size_val = stars_size.value;
-perlinNoise();
-stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val,stars_white_val);
-gradient();
 $('#stars_size_val').val(stars_size_val);
 stars_size.addEventListener("change", function(event) {
    stars_size_val = event.target.value;
-   perlinNoise();
-   stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val,stars_white_val);
-   gradient();
+   generateGalaxy()
    $('#stars_size_val').val(stars_size_val);
  });
 
 
 stars_variability = document.getElementById("stars_variability");
 stars_variability_val = stars_variability.value;
-perlinNoise();
-stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val,stars_white_val);
-gradient();
 $('#stars_variability_val').val(stars_variability_val);
 stars_variability.addEventListener("change", function(event) {
    stars_variability_val = event.target.value;
-   perlinNoise();
-   stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val,stars_white_val);
-   gradient();
+   generateGalaxy()
    $('#stars_variability_val').val(stars_variability_val);
  });
 
 
-
-perlinNoise();
-stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val,stars_white_val);
-gradient();
 stars_color1.addEventListener("change", function(event) {
    stars_color1_val = hexToRgb(event.target.value);
-   perlinNoise();
-   stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val,stars_white_val);
-   gradient();
+   generateGalaxy()
 });
 
 
-perlinNoise();
-stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val,stars_white_val);
-gradient();
 stars_color2.addEventListener("change", function(event) {
    stars_color2_val = hexToRgb(event.target.value);
-   perlinNoise();
-   stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val,stars_white_val);
-   gradient();
+   generateGalaxy()
 });
 
 
 stars_useColor2 = document.getElementById("stars_useColor2");
 stars_useColor2_val = stars_useColor2.checked;
-perlinNoise();
-stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val,stars_white_val);
-gradient();
 stars_useColor2.addEventListener("change", function(event) {
    stars_useColor2_val = event.target.checked;
    if(stars_useColor2_val == true) {
@@ -313,35 +430,107 @@ stars_useColor2.addEventListener("change", function(event) {
    else {
       $('#stars_color2').attr('disabled',true);
    }
-   perlinNoise();
-   stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val,stars_white_val);
-   gradient();
+   generateGalaxy()
 });
 
 
 stars_tail = document.getElementById("stars_tail");
 stars_tail_val = stars_tail.value;
-perlinNoise();
-stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val,stars_white_val);
-gradient();
 $('#stars_tail_val').val(stars_tail_val);
 stars_tail.addEventListener("change", function(event) {
    stars_tail_val = event.target.value;
-   perlinNoise();
-   stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val,stars_white_val);
-   gradient();
+   generateGalaxy()
    $('#stars_tail_val').val(stars_tail_val);
  });
 
 
 stars_white = document.getElementById("stars_white");
 stars_white_val = stars_white.checked;
-perlinNoise();
-stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val,stars_white_val);
-gradient();
 stars_white.addEventListener("change", function(event) {
    stars_white_val = event.target.checked;
-   perlinNoise();
-   stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val,stars_white_val);
-   gradient();
+   generateGalaxy()
 });
+
+
+neb_color1.addEventListener("change", function(event) {
+   neb_color1_val = hexToRgb(event.target.value);
+   generateGalaxy()
+});
+
+
+neb_color2.addEventListener("change", function(event) {
+   neb_color2_val = hexToRgb(event.target.value);
+   generateGalaxy()
+});
+
+
+neb_useColor2 = document.getElementById("neb_useColor2");
+neb_useColor2_val = neb_useColor2.checked;
+neb_useColor2.addEventListener("change", function(event) {
+   neb_useColor2_val = event.target.checked;
+   if(neb_useColor2_val == true) {
+      $('#neb_color2').removeAttr('disabled');
+   }
+   else {
+      $('#neb_color2').attr('disabled',true);
+   }
+   generateGalaxy()
+});
+
+
+neb_size = document.getElementById("neb_size");
+neb_size_val = neb_size.value;
+$('#neb_size_val').val(neb_size_val);
+neb_size.addEventListener("change", function(event) {
+   neb_size_val = event.target.value;
+   generateGalaxy()
+   $('#neb_size_val').val(neb_size_val);
+ });
+
+
+neb_blur = document.getElementById("neb_blur");
+neb_blur_val = neb_blur.value;
+$('#neb_blur_val').val(neb_blur_val);
+neb_blur.addEventListener("change", function(event) {
+   neb_blur_val = event.target.value;
+   generateGalaxy()
+   $('#neb_blur_val').val(neb_blur_val);
+ });
+
+neb_density = document.getElementById("neb_density");
+neb_density_val = neb_density.value;
+$('#neb_density_val').val(neb_density_val);
+neb_density.addEventListener("change", function(event) {
+   neb_density_val = event.target.value;
+   generateGalaxy()
+   $('#neb_density_val').val(neb_density_val);
+ });
+
+
+ bg_color1.addEventListener("change", function(event) {
+   bg_color1_val = hexToRgb(event.target.value);
+   generateGalaxy()
+});
+
+
+bg_color2.addEventListener("change", function(event) {
+   bg_color2_val = hexToRgb(event.target.value);
+   generateGalaxy()
+});
+
+
+bg_useColor2 = document.getElementById("bg_useColor2");
+bg_useColor2_val = bg_useColor2.checked;
+bg_useColor2.addEventListener("change", function(event) {
+   bg_useColor2_val = event.target.checked;
+   if(bg_useColor2_val == true) {
+      $('#bg_color2').removeAttr('disabled');
+   }
+   else {
+      $('#bg_color2').attr('disabled',true);
+   }
+   generateGalaxy()
+});
+
+
+generateGalaxy()
