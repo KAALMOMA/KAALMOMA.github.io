@@ -76,7 +76,7 @@ function perlinNoise(scale = 5) {
    }
  }
 
- function drawPixel(x, y, c1, c2, a, shape, scale, variability, isEnabled,stars_tail_val) {
+ function drawPixel(x, y, c1, c2, a, shape, scale, variability, isEnabled, stars_tail_val, whiteCenter) {
    let rgbArr = randomColorBetween(c1[0],c1[1],c1[2],c2[0],c2[1],c2[2],isEnabled);
    let color = 'rgba('+rgbArr[0]+','+rgbArr[1]+','+rgbArr[2]+','+a+')';
    ctx.fillStyle = color;
@@ -85,43 +85,94 @@ function perlinNoise(scale = 5) {
    let rand = randomInRange(Math.max((parseFloat(scale)-(parseFloat(variability)*factor)),1),(parseFloat(scale)+(parseFloat(variability)*factor)));
    //console.log("\nS+V >> ",scale+variability);
    //console.log("RAND >> ",rand);
+   let glow = true;
+   if(glow == true) {
+      let alph = 0;
+      let radCircle = rand*(scale/8);
+      for(let i = 0; i <= 10; ++i) {
+         alph = Math.pow((i/10),Math.E)/8;
+         color = 'rgba('+rgbArr[0]+','+rgbArr[1]+','+rgbArr[2]+','+alph+')';
+         ctx.fillStyle = color;
+         let rad = radCircle + rand*((10-i)/5);
+         if(shape != "circle") {
+            let innerSquareSize = rand*(scale/4);
+            let centerOffset = innerSquareSize/2;
+            ctx.beginPath();
+            ctx.arc(x+centerOffset, y+centerOffset, rad, 0, 2 * Math.PI);
+            ctx.fill();
+         } else {
+            ctx.beginPath();
+            ctx.arc(x, y, rad, 0, 2 * Math.PI);
+            ctx.fill();
+         }
+         //console.log("TEST >> "+alph);
+      }
+   }
+   color = 'rgba('+rgbArr[0]+','+rgbArr[1]+','+rgbArr[2]+','+a+')';
+   ctx.fillStyle = color;
    if(shape == "square") {
       rand = rand*(scale/4);
       ctx.fillRect(x, y, rand, rand);
+      if(whiteCenter) {
+         let br = Math.max(a*2,255);
+         let white = 'rgba('+255+','+255+','+255+','+br+')';
+         ctx.fillStyle = white;
+         ctx.fillRect(x+0.75, y+0.75, rand-1.5, rand-1.5);
+      }
    }
    else if(shape == "circle") {
       rand = rand*(scale/8);
       ctx.beginPath();
       ctx.arc(x, y, rand, 0, 2 * Math.PI);
       ctx.fill();
+      if(whiteCenter) {
+         let br = Math.max(a*2,255);
+         let white = 'rgba('+255+','+255+','+255+','+br+')';
+         ctx.fillStyle = white;
+         ctx.beginPath();
+         ctx.arc(x, y, Math.max(rand-1,0.25), 0, 2 * Math.PI);
+         ctx.fill();
+      }
    }
    else if(shape == "4-prong") {
       let alpha = 0;
       rand = rand*(scale/4);
       for(let i = x-parseInt(stars_tail_val); i < x+parseInt(stars_tail_val); ++i) {
          ctx.fillStyle = 'rgba('+rgbArr[0]+','+rgbArr[1]+','+rgbArr[2]+','+alpha+')';
-         alpha = ( (-1) * Math.abs(i-x) + parseInt(stars_tail_val)) / parseInt(stars_tail_val);
+         let rad = x+parseInt(stars_tail_val)-(x-parseInt(stars_tail_val));
+         if(i < x) {
+            alpha = (((-1) * Math.sqrt((0.5*rad)**2 - (i-(x-1-0.5*rad))**2)) / (0.5*rad))+1;
+         } else {
+            alpha = (((-1) * Math.sqrt((0.5*rad)**2 - (i-(x-1-0.5*rad)-rad)**2)) / (0.5*rad))+1;
+         }
          ctx.fillRect(i, y, rand, rand);
       }
       alpha = 0;
       for(let j = y-parseInt(stars_tail_val); j < y+parseInt(stars_tail_val); ++j) {
          ctx.fillStyle = 'rgba('+rgbArr[0]+','+rgbArr[1]+','+rgbArr[2]+','+alpha+')';
-         alpha = ( (-1) * Math.abs(j-y) + parseInt(stars_tail_val)) / parseInt(stars_tail_val);
+         let rad = y+parseInt(stars_tail_val)-(y-parseInt(stars_tail_val));
+         if(j < y) {
+            alpha = (((-1) * Math.sqrt((0.5*rad)**2 - (j-(y-1-0.5*rad))**2)) / (0.5*rad))+1;
+         } else {
+            alpha = (((-1) * Math.sqrt((0.5*rad)**2 - (j-(y-1-0.5*rad)-rad)**2)) / (0.5*rad))+1;
+         }
          ctx.fillRect(x, j, rand, rand);
       }
-      ctx.fillStyle = 'white';
+      if(whiteCenter) {
+         let white = 'rgba('+255+','+255+','+255+','+a+')';
+         ctx.fillStyle = white;
+      }
       ctx.fillRect(x, y, rand, rand);
    }
  }
 
- function stars(density = 0.025, shape = "circle", scale = 3, variability = 1, color1 = [255,255,255], color2 = [0,0,0], isEnabled = false, stars_tail_val = 10) {
+ function stars(density = 0.025, shape = "circle", scale = 3, variability = 1, color1 = [255,255,255], color2 = [0,0,0], isEnabled = false, stars_tail_val = 10, whiteCenter = false) {
    for (let y = 0; y < cnvs.height; y += 1){
       for (let x = 0; x < cnvs.width; x += 1){
          let rand = Math.random();
          let br = Math.floor(Math.random()*255);
          if(rand < density/100) {
-            drawPixel(x,y,color1,color2,br,shape,scale,variability,isEnabled,stars_tail_val);
-            
+            drawPixel(x,y,color1,color2,br,shape,scale,variability,isEnabled,stars_tail_val,whiteCenter);
          }
       }
    }
@@ -155,18 +206,19 @@ stars_useColor2 = null;
 stars_useColor2_val = null;
 stars_tail = null;
 stars_tail_val = null;
-
+stars_white = null;
+stars_white_val = null;
 
 stars_density = document.getElementById("stars_density");
 stars_density_val = stars_density.value;
 perlinNoise();
-stars(stars_density_val,stars_shape_val, stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val);
+stars(stars_density_val,stars_shape_val, stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val,stars_white_val);
 gradient();
 $('#stars_density_val').val(stars_density_val);
 stars_density.addEventListener("change", function(event) {
    stars_density_val = event.target.value;
    perlinNoise();
-   stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val);
+   stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val,stars_white_val);
    gradient();
    $('#stars_density_val').val(stars_density_val);
  });
@@ -175,7 +227,7 @@ stars_density.addEventListener("change", function(event) {
 stars_shape = document.getElementById("stars_shape");
 stars_shape_val = stars_shape.value;
 perlinNoise();
-stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val);
+stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val,stars_white_val);
 gradient();
 stars_shape.addEventListener("change", function(event) {
    stars_shape_val = event.target.value;
@@ -190,7 +242,7 @@ stars_shape.addEventListener("change", function(event) {
       $('#stars_tail_val').attr('hidden',true);
    }
    perlinNoise();
-   stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val);
+   stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val,stars_white_val);
    gradient();
  });
 
@@ -198,13 +250,13 @@ stars_shape.addEventListener("change", function(event) {
 stars_size = document.getElementById("stars_size");
 stars_size_val = stars_size.value;
 perlinNoise();
-stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val);
+stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val,stars_white_val);
 gradient();
 $('#stars_size_val').val(stars_size_val);
 stars_size.addEventListener("change", function(event) {
    stars_size_val = event.target.value;
    perlinNoise();
-   stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val);
+   stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val,stars_white_val);
    gradient();
    $('#stars_size_val').val(stars_size_val);
  });
@@ -213,13 +265,13 @@ stars_size.addEventListener("change", function(event) {
 stars_variability = document.getElementById("stars_variability");
 stars_variability_val = stars_variability.value;
 perlinNoise();
-stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val);
+stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val,stars_white_val);
 gradient();
 $('#stars_variability_val').val(stars_variability_val);
 stars_variability.addEventListener("change", function(event) {
    stars_variability_val = event.target.value;
    perlinNoise();
-   stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val);
+   stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val,stars_white_val);
    gradient();
    $('#stars_variability_val').val(stars_variability_val);
  });
@@ -227,23 +279,23 @@ stars_variability.addEventListener("change", function(event) {
 
 
 perlinNoise();
-stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val);
+stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val,stars_white_val);
 gradient();
 stars_color1.addEventListener("change", function(event) {
    stars_color1_val = hexToRgb(event.target.value);
    perlinNoise();
-   stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val);
+   stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val,stars_white_val);
    gradient();
 });
 
 
 perlinNoise();
-stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val);
+stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val,stars_white_val);
 gradient();
 stars_color2.addEventListener("change", function(event) {
    stars_color2_val = hexToRgb(event.target.value);
    perlinNoise();
-   stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val);
+   stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val,stars_white_val);
    gradient();
 });
 
@@ -251,7 +303,7 @@ stars_color2.addEventListener("change", function(event) {
 stars_useColor2 = document.getElementById("stars_useColor2");
 stars_useColor2_val = stars_useColor2.checked;
 perlinNoise();
-stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val);
+stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val,stars_white_val);
 gradient();
 stars_useColor2.addEventListener("change", function(event) {
    stars_useColor2_val = event.target.checked;
@@ -262,7 +314,7 @@ stars_useColor2.addEventListener("change", function(event) {
       $('#stars_color2').attr('disabled',true);
    }
    perlinNoise();
-   stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val);
+   stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val,stars_white_val);
    gradient();
 });
 
@@ -270,13 +322,26 @@ stars_useColor2.addEventListener("change", function(event) {
 stars_tail = document.getElementById("stars_tail");
 stars_tail_val = stars_tail.value;
 perlinNoise();
-stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val);
+stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val,stars_white_val);
 gradient();
 $('#stars_tail_val').val(stars_tail_val);
 stars_tail.addEventListener("change", function(event) {
    stars_tail_val = event.target.value;
    perlinNoise();
-   stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val);
+   stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val,stars_white_val);
    gradient();
    $('#stars_tail_val').val(stars_tail_val);
  });
+
+
+stars_white = document.getElementById("stars_white");
+stars_white_val = stars_white.checked;
+perlinNoise();
+stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val,stars_white_val);
+gradient();
+stars_white.addEventListener("change", function(event) {
+   stars_white_val = event.target.checked;
+   perlinNoise();
+   stars(stars_density_val,stars_shape_val,stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val,stars_white_val);
+   gradient();
+});
