@@ -1,22 +1,23 @@
 let cnvs = document.getElementById('cnvs');
 let ctx = cnvs.getContext('2d', { willReadFrequently: true });
+let CANVAS_SIZE = 512;
 
 function hexToRgb(hex) {
    // Remove the '#' if it exists
    hex = hex.replace("#", "");
- 
    // Handle shorthand hex codes (e.g., #abc)
    if (hex.length === 3) {
      hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
    }
- 
    // Parse the hex values for red, green, and blue
    const r = parseInt(hex.substring(0, 2), 16);
    const g = parseInt(hex.substring(2, 4), 16);
    const b = parseInt(hex.substring(4, 6), 16);
- 
    return [r,g,b];
  }
+
+
+
 
 function randomInRange(min = 0, max = 1) {
    if(max == min) {
@@ -26,6 +27,9 @@ function randomInRange(min = 0, max = 1) {
    rand = rand * (max - min) + min;
    return rand;
 }
+
+
+
 
 function randomColorBetween(c1r,c1g,c1b,c2r,c2g,c2b, isEnabled) {
    /*Find the difference between the two values, get a random int between
@@ -52,9 +56,16 @@ function randomColorBetween(c1r,c1g,c1b,c2r,c2g,c2b, isEnabled) {
    }
 }
 
+function hueFromAlpha(alpha = 0.5) {
+   return (359*2 * alpha) + 180;
+}
 
 
 
+
+function satFromAlpha(alpha = 0.5) {
+   return (alpha*100)+0.1;
+}
 
 
 
@@ -75,6 +86,9 @@ function gaussian1D(sigma, kernelSize) {
    return kernel.map(v => v / sum);
  }
  
+
+
+
  function blur1D(data, width, height, kernel, horizontal = true) {
    const output = new Uint8ClampedArray(data.length);
    const half = Math.floor(kernel.length / 2);
@@ -101,40 +115,30 @@ function gaussian1D(sigma, kernelSize) {
        output[i + 3] = a;
      }
    }
- 
    return output;
  }
  
+
+
+
  function applySeparableGaussianBlur(imageData, width, height, sigma = 2.0) {
    const kernelSize = Math.ceil(sigma * 6) | 1; // make odd
    const kernel = gaussian1D(sigma, kernelSize);
    const pixels = imageData.data;
    const horizBlurred = blur1D(pixels, width, height, kernel, true);
    const vertBlurred = blur1D(horizBlurred, width, height, kernel, false);
- 
    // Copy result back
    for (let i = 0; i < pixels.length; i++) {
      pixels[i] = vertBlurred[i];
    }
- 
    return imageData;
  }
- 
-
-
-
-
-
-
-
-
-
 
 
 
 
 function fillBackground(c1,c2,isEnabled = false) {
-   const gradient = ctx.createLinearGradient(0, 0, 0, 512);
+   const gradient = ctx.createLinearGradient(0, 0, 0, CANVAS_SIZE);
    if(isEnabled) {
       gradient.addColorStop(0, "rgb("+c1[0]+","+c1[1]+","+c1[2]+")");
       gradient.addColorStop(1, "rgb("+c2[0]+","+c2[1]+","+c2[2]+")");
@@ -142,35 +146,11 @@ function fillBackground(c1,c2,isEnabled = false) {
    } else {
       ctx.fillStyle = "rgb("+c1[0]+","+c1[1]+","+c1[2]+")";
    }
-   ctx.fillRect(0, 0, 512, 512);
+   ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
 }
 
-function perlinNoise(scale = 5, contrast = 80, color = 'hsla(240,50%,50%,1)') {
-   fillBackground("rgb(0,0,0)");
-   if(false) {
-   const GRID_SIZE = scale;
-   const RESOLUTION = 80;
-   const COLOR_SCALE = contrast;
 
-   let pixel_size = cnvs.width / RESOLUTION;
-   let num_pixels = GRID_SIZE / RESOLUTION;
 
-   for (let y = 0; y < GRID_SIZE; y += num_pixels / GRID_SIZE){
-      for (let x = 0; x < GRID_SIZE; x += num_pixels / GRID_SIZE){
-         let v = parseInt(perlin.get(x, y) * COLOR_SCALE);
-         let b = ((v/8)+15);
-         let s = b+15;
-         ctx.fillStyle = 'hsl(240,'+s+'%,'+b+'%)';
-         ctx.fillRect(
-               x / GRID_SIZE * cnvs.width,
-               y / GRID_SIZE * cnvs.width,
-               pixel_size,
-               pixel_size
-         );
-      }
-   }
-   }
- }
 
  function nebulas(c1 = [255,0,0], c2 = [0,0,255], max = 30, blur = 30, density = 4, isEnabled = false) {
    density = density/10000;
@@ -201,8 +181,13 @@ function perlinNoise(scale = 5, contrast = 80, color = 'hsla(240,50%,50%,1)') {
       }
  }
 
- function drawPixel(x, y, c1, c2, a, shape, scale, variability, isEnabled, stars_tail_val, whiteCenter) {
+ function drawPixel(x, y, c1, c2, a, shape, scale, variability, isEnabled, stars_tail_val, whiteCenter, isRainbow) {
    let rgbArr = randomColorBetween(c1[0],c1[1],c1[2],c2[0],c2[1],c2[2],isEnabled);
+   if(isRainbow) {
+      rgbArr[0] = Math.floor(Math.random()*255);
+      rgbArr[1] = Math.floor(Math.random()*255);
+      rgbArr[2] = Math.floor(Math.random()*255);
+   }
    let color = 'rgba('+rgbArr[0]+','+rgbArr[1]+','+rgbArr[2]+','+a+')';
    ctx.fillStyle = color;
    //let rand = randomInRange(scale-variability,scale+variability);
@@ -263,7 +248,13 @@ function perlinNoise(scale = 5, contrast = 80, color = 'hsla(240,50%,50%,1)') {
       let alpha = 0;
       rand = rand*(scale/4);
       for(let i = x-parseInt(stars_tail_val); i < x+parseInt(stars_tail_val); ++i) {
-         ctx.fillStyle = 'rgba('+rgbArr[0]+','+rgbArr[1]+','+rgbArr[2]+','+alpha+')';
+         if(isRainbow){
+            let h = hueFromAlpha(alpha);
+            let s = satFromAlpha(alpha);
+            ctx.fillStyle = 'hsla('+h+','+s+'%,50%,'+alpha+')';
+         } else {
+            ctx.fillStyle = 'rgba('+rgbArr[0]+','+rgbArr[1]+','+rgbArr[2]+','+alpha+')';
+         }
          let rad = x+parseInt(stars_tail_val)-(x-parseInt(stars_tail_val));
          if(i < x) {
             alpha = (((-1) * Math.sqrt((0.5*rad)**2 - (i-(x-1-0.5*rad))**2)) / (0.5*rad))+1;
@@ -274,7 +265,13 @@ function perlinNoise(scale = 5, contrast = 80, color = 'hsla(240,50%,50%,1)') {
       }
       alpha = 0;
       for(let j = y-parseInt(stars_tail_val); j < y+parseInt(stars_tail_val); ++j) {
-         ctx.fillStyle = 'rgba('+rgbArr[0]+','+rgbArr[1]+','+rgbArr[2]+','+alpha+')';
+         if(isRainbow){
+            let h = hueFromAlpha(alpha);
+            let s = satFromAlpha(alpha);
+            ctx.fillStyle = 'hsla('+h+','+s+'%,50%,'+alpha+')';
+         } else {
+            ctx.fillStyle = 'rgba('+rgbArr[0]+','+rgbArr[1]+','+rgbArr[2]+','+alpha+')';
+         }
          let rad = y+parseInt(stars_tail_val)-(y-parseInt(stars_tail_val));
          if(j < y) {
             alpha = (((-1) * Math.sqrt((0.5*rad)**2 - (j-(y-1-0.5*rad))**2)) / (0.5*rad))+1;
@@ -291,14 +288,14 @@ function perlinNoise(scale = 5, contrast = 80, color = 'hsla(240,50%,50%,1)') {
    }
  }
 
- function stars(density = 0.025, shape = "circle", scale = 3, variability = 1, color1 = [255,255,255], color2 = [0,0,0], isEnabled = false, stars_tail_val = 10, whiteCenter = false) {
+ function stars(density = 0.025, shape = "circle", scale = 3, variability = 1, color1 = [255,255,255], color2 = [0,0,0], isEnabled = false, stars_tail_val = 10, whiteCenter = false, isRainbow = false) {
    if(true) {
    for (let y = 0; y < cnvs.height; y += 1){
       for (let x = 0; x < cnvs.width; x += 1){
          let rand = Math.random();
          let br = Math.floor(Math.random()*255);
          if(rand < density/100) {
-            drawPixel(x,y,color1,color2,br,shape,scale,variability,isEnabled,stars_tail_val,whiteCenter);
+            drawPixel(x,y,color1,color2,br,shape,scale,variability,isEnabled,stars_tail_val,whiteCenter, isRainbow);
          }
       }
    }
@@ -306,17 +303,17 @@ function perlinNoise(scale = 5, contrast = 80, color = 'hsla(240,50%,50%,1)') {
  }
 
  function gradient() {
-   const grad=ctx.createLinearGradient(0,512,0,0);
+   const grad=ctx.createLinearGradient(0,CANVAS_SIZE,0,0);
    grad.addColorStop(0, "rgba(255,0,255,5%)");
    grad.addColorStop(1, "rgba(20,30,255,5%)");
    ctx.fillStyle = grad;
-   ctx.fillRect(0,0,512,512);
+   ctx.fillRect(0,0,CANVAS_SIZE,CANVAS_SIZE);
  }
 
  function generateGalaxy() {
    fillBackground(bg_color1_val,bg_color2_val,bg_useColor2_val);
    nebulas(neb_color1_val,neb_color2_val,neb_size_val,neb_blur_val,neb_density_val,neb_useColor2_val);
-   stars(stars_density_val,stars_shape_val, stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val,stars_white_val);
+   stars(stars_density_val,stars_shape_val, stars_size_val,stars_variability_val,stars_color1_val,stars_color2_val,stars_useColor2_val,stars_tail_val,stars_white_val,isRainbow_val);
  }
 
 stars_density = null;
@@ -359,6 +356,8 @@ bg_color2 = document.getElementById("bg_color2");
 bg_color2_val = hexToRgb(bg_color2.value);
 bg_useColor2 = null;
 bg_useColor2_val = null;
+isRainbow = null;
+isRainbow_val = null;
 
 stars_density = document.getElementById("stars_density");
 stars_density_val = stars_density.value;
@@ -529,6 +528,14 @@ bg_useColor2.addEventListener("change", function(event) {
    else {
       $('#bg_color2').attr('disabled',true);
    }
+   generateGalaxy()
+});
+
+
+isRainbow = document.getElementById("isRainbow");
+isRainbow_val = isRainbow.checked;
+isRainbow.addEventListener("change", function(event) {
+   isRainbow_val = event.target.checked;
    generateGalaxy()
 });
 
