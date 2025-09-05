@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Katrina's Visual Design Portfolio</title>
+    <link rel="icon" href="purple-heart-svgrepo-com.svg" type="image/x-icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kulim+Park:wght@200;300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="TrianglesMosaicBg.min.js"></script>
+</head>
+<body>
+    <div id="box"></div>
+    <header class="header">
+        <h1>Katrina Mosquera-Maykovych</h1>
+        <p>Visual Design Portfolio</p>
+    </header>
+
+    <main class="main-content">
+        <!-- About Section - Moved to top -->
+        <section class="about-section">
+            <h2>About My Work</h2>
+            <p>Here is a collection of all of my works over the past few years, in no particular order. These include personal pieces, commissioned pieces, and work I've done during my contract with a robotics startup out of Yale.</p>
+        </section>
+
+        <!-- 
+        PORTFOLIO TILES - MASONRY COLLAGE SYSTEM
+        
+        To add a new tile, copy the structure below and customize:
+        
+        <div class="collage-item [tile-size-class]">
+            <img src="path/to/your/image.jpg" alt="Description">
+        </div>
+        
+        Available tile size classes:
+        - tile-medium (slightly taller)
+        - tile-wide (landscape format) 
+        - tile-tall (portrait format)
+        - tile-large (bigger square)
+        - tile-extra-tall (very tall)
+        
+        The system automatically creates a masonry layout with varied sizes
+        that fit together cohesively without gaps or awkward spacing.
+        
+        For videos, use the same structure with <video> tags:
+        <video autoplay muted loop playsinline data-transparent>
+            <source src="path/to/video.webm" type="video/webm">
+        </video>
+        
+        Note: Add data-transparent attribute for videos with transparent backgrounds
+        -->
+        
+        <div class="collage-grid">
+            <!-- Video: PCB 360 Animation - Large -->
+            <div class="collage-item tile-large">
+                <video autoplay muted loop playsinline data-transparent>
+                    <source src="pcb_360.webm" type="video/webm">
+                </video>
+            </div>
+
+            <!-- Character: Angel - Medium -->
+            <div class="collage-item tile-medium">
+                <img src="Angel.png" alt="Angel character illustration">
+            </div>
+
+            <!-- 3D Render: Beer Bottle - Default -->
+            <div class="collage-item">
+                <img src="Beer3D.png" alt="3D beer bottle render">
+            </div>
+
+            <!-- Video: Open Source Animation - Wide -->
+            <div class="collage-item tile-wide">
+                <video autoplay muted loop playsinline data-transparent>
+                    <source src="open_source.webm" type="video/webm">
+                </video>
+            </div>
+
+            <!-- Character: Dragon Lady - Tall -->
+            <div class="collage-item tile-tall">
+                <img src="Dragonladyy.png" alt="Dragon lady character">
+            </div>
+
+            <!-- 3D Render: Wine Bottle - Default -->
+            <div class="collage-item">
+                <img src="WineBottle.png" alt="3D wine bottle render">
+            </div>
+
+            <!-- Character: Fighting Man - Medium -->
+            <div class="collage-item tile-medium">
+                <img src="FightingMan.png" alt="Fighting man character">
+            </div>
+
+            <!-- Video: Driving Isometric - Wide -->
+            <div class="collage-item tile-wide">
+                <video autoplay muted loop playsinline data-transparent>
+                    <source src="driving_isometric.webm" type="video/webm">
+                </video>
+            </div>
+
+            <!-- Character: Kira Yoshikage - Default -->
+            <div class="collage-item">
+                <img src="KiraYoshikageNew.png" alt="Kira Yoshikage character">
+            </div>
+
+            <!-- 3D Render: Handphone - Tall -->
+            <div class="collage-item tile-tall">
+                <img src="Handphomet.png" alt="3D handphone render">
+            </div>
+
+            <!-- Character: Mosquito Girl - Default -->
+            <div class="collage-item">
+                <img src="MosquitoGIrl.png" alt="Mosquito girl character">
+            </div>
+
+            <!-- Video: Recycling Animation - Large -->
+            <div class="collage-item tile-large">
+                <video autoplay muted loop playsinline data-transparent>
+                    <source src="recycling.webm" type="video/webm">
+                </video>
+            </div>
+
+            <!-- Character: Johnathan - Medium -->
+            <div class="collage-item tile-medium">
+                <img src="Johnathan!.png" alt="Johnathan character">
+            </div>
+
+            <!-- 3D Render: Martini - Default -->
+            <div class="collage-item">
+                <img src="Martini.png" alt="3D martini glass render">
+            </div>
+
+            <!-- Character: Chromboy - Wide -->
+            <div class="collage-item tile-wide">
+                <img src="Chromboy.png" alt="Chromboy character">
+            </div>
+
+            <!-- 3D Render: Planetoid - Default -->
+            <div class="collage-item">
+                <img src="Planetoid.png" alt="3D planetoid render">
+            </div>
+
+            <!-- Character: Pea Shooter - Medium -->
+            <div class="collage-item tile-medium">
+                <img src="PeaShooterGIF.gif" alt="Pea shooter character">
+            </div>
+
+            <!-- 3D Render: Wine Glass - Default -->
+            <div class="collage-item">
+                <img src="Wine.png" alt="3D wine glass render">
+            </div>
+
+            <!-- Character: 6-Drown - Tall -->
+            <div class="collage-item tile-tall">
+                <img src="6-Drown.png" alt="6-Drown character">
+            </div>
+
+            <!-- 3D Render: Beer Pixel - Default -->
+            <div class="collage-item">
+                <img src="beer_px.png" alt="Pixel art beer">
+            </div>
+
+            <!-- Character: Mojo 8-bit - Medium -->
+            <div class="collage-item tile-medium">
+                <img src="mojo8bit.png" alt="Mojo 8-bit character">
+            </div>
+
+            <!-- 3D Render: Blue Final - Default -->
+            <div class="collage-item">
+                <img src="blue_final.png" alt="Blue final render">
+            </div>
+
+            <!-- Character: Thumb - Wide -->
+            <div class="collage-item tile-wide">
+                <img src="Thumb2.png" alt="Thumb character">
+            </div>
+
+            <!-- 3D Render: 2D3D Apples - Default -->
+            <div class="collage-item">
+                <img src="2d3d_applesPNG.png" alt="2D3D apples render">
+            </div>
+
+            <!-- Character: Commission - Medium -->
+            <div class="collage-item tile-medium">
+                <img src="commission.png" alt="Commission artwork">
+            </div>
+
+            <!-- 3D Render: 3DP Compressed - Default -->
+            <div class="collage-item">
+                <img src="3DP_Compressed.png" alt="3D print compressed">
+            </div>
+
+            <!-- Character: Crescendolls - Tall -->
+            <div class="collage-item tile-tall">
+                <img src="Crescendolls.jpg" alt="Crescendolls artwork">
+            </div>
+
+            <!-- 3D Render: Epic 2D3D Final - Default -->
+            <div class="collage-item">
+                <img src="Epic2d3dFINALEX3.png" alt="Epic 2D3D final render">
+            </div>
+
+            <!-- UI Design: FBX Dashboard - Medium -->
+            <div class="collage-item tile-medium">
+                <img src="FBX_dashboard_banner_COMPRESSED.png" alt="FBX dashboard banner">
+            </div>
+
+            <!-- UI Design: FBX Slide - Default -->
+            <div class="collage-item">
+                <img src="FBX-slide3-square.png" alt="FBX slide design">
+            </div>
+
+            <!-- Character: Mojo Logo 8-bit - Wide -->
+            <div class="collage-item tile-wide">
+                <img src="mojologo_8bit.png" alt="Mojo logo 8-bit">
+            </div>
+
+            <!-- 3D Render: Red Ball HD - Default -->
+            <div class="collage-item">
+                <img src="redwball_HD.png" alt="Red ball HD render">
+            </div>
+
+            <!-- Character: Mojo Alt 2 - Medium -->
+            <div class="collage-item tile-medium">
+                <img src="mojoalt2upscale.png" alt="Mojo alt 2 upscale">
+            </div>
+
+            <!-- 3D Render: SMP V1 - Default -->
+            <div class="collage-item">
+                <img src="smp_v1_edited_final2.png" alt="SMP v1 final render">
+            </div>
+
+            <!-- Character: SI Series - Various sizes -->
+            <div class="collage-item tile-tall">
+                <img src="SI3_Ex3.png" alt="SI3 Ex3 character">
+            </div>
+
+            <div class="collage-item">
+                <img src="SI4_Ex1.png" alt="SI4 Ex1 character">
+            </div>
+
+            <div class="collage-item tile-medium">
+                <img src="SI4_v2_two2-MoreAngry.png" alt="SI4 v2 angry character">
+            </div>
+
+            <div class="collage-item">
+                <img src="SI5_V2_Ex1.png" alt="SI5 V2 Ex1 character">
+            </div>
+
+            <div class="collage-item tile-wide">
+                <img src="SI6_EX2.png" alt="SI6 Ex2 character">
+            </div>
+
+            <div class="collage-item">
+                <img src="SI8_V3_ExFinal.png" alt="SI8 V3 ExFinal character">
+            </div>
+
+            <div class="collage-item tile-medium">
+                <img src="SI11_V4_Ex2.png" alt="SI11 V4 Ex2 character">
+            </div>
+
+            <div class="collage-item">
+                <img src="SI13_Ex1_redshifted.png" alt="SI13 Ex1 redshifted character">
+            </div>
+
+
+            <!-- UI Design: Present Bug - Default -->
+            <div class="collage-item">
+                <img src="1920x1080_PWESENT_Bug.png" alt="Present bug UI design">
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Modal/Lightbox -->
+    <div id="modal" class="modal">
+        <span class="modal-close">&times;</span>
+        <span class="modal-nav modal-prev" id="modalPrev">&#8249;</span>
+        <span class="modal-nav modal-next" id="modalNext">&#8250;</span>
+        <div class="modal-content" id="modalContent"></div>
+        <div class="modal-info" id="modalInfo"></div>
+    </div>
+
+    <script>
+        // Initialize Triangle Mosaic Background
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize triangle mosaic background
+            let colorbg = new Color4Bg.TrianglesMosaicBg({
+                dom: "box",
+                colors: ["#c6b0e3","#DBC2EE","#F4DAF9","#FFECE9","#F9D7E2","#FEC5D8"],
+                loop: true
+            });
+            
+            // Dynamic aspect ratio system and modal functionality
+            const tiles = document.querySelectorAll('.collage-item');
+            const modal = document.getElementById('modal');
+            const modalContent = document.getElementById('modalContent');
+            const modalInfo = document.getElementById('modalInfo');
+            const modalClose = document.querySelector('.modal-close');
+            const modalPrev = document.getElementById('modalPrev');
+            const modalNext = document.getElementById('modalNext');
+            
+            let currentIndex = 0;
+            let mediaItems = [];
+            
+            // Initialize tiles and collect media items
+            tiles.forEach((tile, index) => {
+                const img = tile.querySelector('img');
+                const video = tile.querySelector('video');
+                
+                // Add to media items array for modal navigation
+                if (img) {
+                    mediaItems.push({
+                        type: 'image',
+                        src: img.src,
+                        alt: img.alt,
+                        element: img
+                    });
+                } else if (video) {
+                    mediaItems.push({
+                        type: 'video',
+                        src: video.querySelector('source').src,
+                        alt: 'Video',
+                        element: video
+                    });
+                }
+                
+                // Add click handler
+                tile.addEventListener('click', () => openModal(index));
+                
+                // Handle image loading and aspect ratios
+                if (img) {
+                    tile.classList.add('loading');
+                    
+                    img.onload = function() {
+                        tile.classList.remove('loading');
+                        setDynamicAspectRatio(tile, img.naturalWidth, img.naturalHeight);
+                    };
+                    
+                    img.onerror = function() {
+                        tile.classList.remove('loading');
+                    };
+                    
+                    if (img.complete) {
+                        tile.classList.remove('loading');
+                        setDynamicAspectRatio(tile, img.naturalWidth, img.naturalHeight);
+                    }
+                } else if (video) {
+                    tile.classList.remove('loading');
+                }
+            });
+            
+            // Modal functionality
+            function openModal(index) {
+                currentIndex = index;
+                const item = mediaItems[index];
+                
+                modalContent.innerHTML = '';
+                modalInfo.textContent = '';
+                
+                if (item.type === 'image') {
+                    const img = document.createElement('img');
+                    img.src = item.src;
+                    img.alt = item.alt;
+                    modalContent.appendChild(img);
+                    modalInfo.textContent = item.alt;
+                } else if (item.type === 'video') {
+                    const video = document.createElement('video');
+                    video.src = item.src;
+                    video.autoplay = true;
+                    video.muted = true;
+                    video.loop = true;
+                    video.controls = true;
+                    modalContent.appendChild(video);
+                    modalInfo.textContent = 'Video';
+                }
+                
+                modal.style.display = 'block';
+                document.body.style.overflow = 'hidden';
+            }
+            
+            function closeModal() {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+                
+                // Pause any playing videos
+                const video = modalContent.querySelector('video');
+                if (video) {
+                    video.pause();
+                }
+            }
+            
+            function showPrev() {
+                currentIndex = (currentIndex - 1 + mediaItems.length) % mediaItems.length;
+                openModal(currentIndex);
+            }
+            
+            function showNext() {
+                currentIndex = (currentIndex + 1) % mediaItems.length;
+                openModal(currentIndex);
+            }
+            
+            // Event listeners
+            modalClose.addEventListener('click', closeModal);
+            modalPrev.addEventListener('click', showPrev);
+            modalNext.addEventListener('click', showNext);
+            
+            // Close modal when clicking outside content
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+            
+            // Keyboard navigation
+            document.addEventListener('keydown', function(e) {
+                if (modal.style.display === 'block') {
+                    switch(e.key) {
+                        case 'Escape':
+                            closeModal();
+                            break;
+                        case 'ArrowLeft':
+                            showPrev();
+                            break;
+                        case 'ArrowRight':
+                            showNext();
+                            break;
+                    }
+                }
+            });
+        });
+        
+        function setDynamicAspectRatio(tile, width, height) {
+            const aspectRatio = width / height;
+            
+            // Remove existing aspect ratio classes
+            tile.classList.remove('tile-medium', 'tile-wide', 'tile-tall', 'tile-large', 'tile-extra-tall');
+            
+            // Set aspect ratio based on image proportions
+            if (aspectRatio > 1.5) {
+                // Very wide images
+                tile.style.aspectRatio = `${Math.min(aspectRatio, 2.5)} / 1`;
+            } else if (aspectRatio > 1.2) {
+                // Wide images
+                tile.style.aspectRatio = `${aspectRatio} / 1`;
+            } else if (aspectRatio < 0.6) {
+                // Very tall images
+                tile.style.aspectRatio = `1 / ${Math.min(1/aspectRatio, 2.5)}`;
+            } else if (aspectRatio < 0.8) {
+                // Tall images
+                tile.style.aspectRatio = `1 / ${1/aspectRatio}`;
+            } else {
+                // Square-ish images
+                tile.style.aspectRatio = `${aspectRatio} / 1`;
+            }
+        }
+    </script>
+</body>
+</html>

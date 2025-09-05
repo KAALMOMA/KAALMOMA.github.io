@@ -1,0 +1,60 @@
+<!-- 
+PORTFOLIO TILE TEMPLATE - DYNAMIC ASPECT RATIO SYSTEM
+Copy this template to add new portfolio items to your collage
+
+BASIC IMAGE TILE (aspect ratio set automatically):
+<div class="collage-item">
+    <img src="path/to/your/image.jpg" alt="Description">
+</div>
+
+VIDEO TILE (with autoplay loop):
+<div class="collage-item tile-large">
+    <video autoplay muted loop playsinline data-transparent>
+        <source src="path/to/your/video.webm" type="video/webm">
+    </video>
+</div>
+
+PLACEHOLDER WITH GRADIENT (for testing):
+<div class="collage-item tile-medium">
+    <div class="placeholder-image gradient-1">
+        <span>Your Text</span>
+    </div>
+</div>
+
+HOW IT WORKS:
+
+For Images:
+- The system automatically detects the image's natural dimensions
+- Sets the tile's aspect ratio to match the image exactly
+- Uses object-fit: contain to preserve the full image without cropping
+- Shows a subtle background color around images that don't fill the tile completely
+
+For Videos:
+- Videos use the assigned tile size classes (tile-large, tile-wide, etc.)
+- Videos use object-fit: cover for seamless playback
+- Aspect ratios are maintained by the CSS classes
+
+Tile Size Classes (for videos and placeholders):
+- tile-medium (slightly taller)
+- tile-wide (landscape format) 
+- tile-tall (portrait format)
+- tile-large (bigger square)
+- tile-extra-tall (very tall)
+
+Gradient Classes: gradient-1, gradient-2, gradient-3, gradient-4, gradient-5, 
+gradient-6, gradient-7, gradient-8, gradient-9, gradient-10
+
+INSTRUCTIONS:
+1. Copy any template above
+2. Replace "path/to/your/image.jpg" with your actual image path
+3. Update the title and description
+4. For images: no size class needed (aspect ratio set automatically)
+5. For videos: choose appropriate tile size class
+6. Paste into the collage-grid div in index.html
+
+The system will automatically:
+- Detect image dimensions
+- Set appropriate aspect ratios
+- Preserve original image proportions
+- Create a cohesive masonry layout
+-->
