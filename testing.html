@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Canvas with SVG Blur</title>
+  <style>
+    #myCanvas {
+      filter: url(#svg-blur);
+    }
+  </style>
+</head>
+<body>
+
+<svg width="0" height="0">
+  <filter id="svg-blur" x="-50%" y="-50%" width="200%" height="200%">
+    <feGaussianBlur in="SourceGraphic" stdDeviation="50" />
+  </filter>
+</svg>
+
+<canvas id="myCanvas" width="300" height="200"></canvas>
+
+<script>
+  const canvas = document.getElementById('myCanvas');
+  const ctx = canvas.getContext('2d');
+
+  // Simple drawing to show the blur
+  ctx.fillStyle = 'red';
+  ctx.beginPath();
+  ctx.arc(150, 100, 50, 0, 2 * Math.PI);
+  ctx.fill();
+</script>
+
+</body>
+</html>
