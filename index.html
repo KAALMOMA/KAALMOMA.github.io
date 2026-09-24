@@ -1,103 +1,290 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <link rel="stylesheet" href="styles.css" />
-    <script src="http://joeiddon.github.io/perlin/perlin.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-  </head>
-  <body>
-    <h1>Parametrized Galaxy Generator</h1>
-    <p>Make the galaxy of your dreams.</p>
-    <div class="row">
-      <div class="col">
-        <canvas id="cnvs" width="512" height="512"></canvas>
-        <h1>Background</h1>
-        <label for="bg_color1">Color(s)</label>
-        <div class="row">
-          <input type="color" id="bg_color1" name="bg_color1" value="#000000" />
-          <div class="row" style="align-items: center; padding-left: 20px; padding-right: 20px;">
-            <label for="bg_useColor2">Linear Gradient?</label>
-            <input type="checkbox" id="bg_useColor2" name="bg_useColor2" />
-          </div>
-          <input type="color" id="bg_color2" name="bg_color2" value="#550055" disabled />
-        </div>
-      </div>
-      <div class="col">
-        <h1>Stars</h1>
-        <label for="stars_density">Density</label>
-        <div class="row">
-          <input type="range" id="stars_density" name="stars_density" min="0" max="2.5" value="0.5" step="0.025" style="width: 256px;" />
-          <input type="number" id="stars_density_val" name="stars_density_val" style="width: 40px;" disabled />
-        </div>
-        <label for="stars_shape">Shape</label>
-        <select id="stars_shape" name="stars_shape">
-          <option value="circle">Circle</option>
-          <option value="square">Square</option>
-          <option value="4-prong">Cross</option>
-        </select>
-        <label for="stars_tail" id="stars_tail_label" hidden>Glint Length</label>
-        <div class="row">
-          <input type="range" id="stars_tail" name="stars_tail" min="10" max="100" value="10" step="5" style="width: 256px;" hidden />
-          <input type="number" id="stars_tail_val" name="stars_tail_val" style="width: 40px;" disabled hidden />
-        </div>
-        <label for="stars_size">Size</label>
-        <div class="row">
-          <input type="range" id="stars_size" name="stars_size" min="1" max="10" value="3" step="0.5" style="width: 256px;" />
-          <input type="number" id="stars_size_val" name="stars_size_val" style="width: 40px;" disabled />
-        </div>
-        <label for="stars_variability">Variability</label>
-        <div class="row">
-          <input type="range" id="stars_variability" name="stars_variability" min="0" max="1" value="0.5" step="0.05" style="width: 256px;" />
-          <input type="number" id="stars_variability_val" name="stars_variability_val" style="width: 40px;" disabled />
-        </div>
-        <label for="stars_color1">Color(s)</label>
-        <div class="col">
-          <input type="color" id="stars_color1" name="stars_color1" value="#ffffff" />
-          <div class="row">
-            <label for="stars_useColor2">Use Secondary Color?</label>
-            <input type="checkbox" id="stars_useColor2" name="stars_useColor2" />
-          </div>
-          <input type="color" id="stars_color2" name="stars_color2" value="#a36353" disabled />
-          <div class="row">
-            <label for="stars_white">White Center?</label>
-            <input type="checkbox" id="stars_white" name="stars_white" />
-          </div>
-          <div class="row">
-            <label for="isRainbow">Rainbow / Random Colors?</label>
-            <input type="checkbox" id="isRainbow" name="isRainbow" />
-          </div>
-        </div>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Katrina Mosquera-Maykovych | Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0E1024;
+    --bg-raised: #161A34;
+    --bg-card: #13152C;
+    --text: #ECE8DE;
+    --text-muted: #9B9FBD;
+    --text-faint: #6E7291;
+    --gold: #E7B24C;
+    --violet: #9C8CE0;
+    --line: rgba(236,232,222,0.12);
+    --line-strong: rgba(236,232,222,0.22);
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); scroll-behavior: smooth; }
+  *, *::before, *::after { box-sizing: inherit; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 17px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection { background: var(--gold); color: #16182B; }
 
-        <h1>Nebulae</h1>
-        <label for="neb_size">Maximum Size</label>
-        <div class="row">
-          <input type="range" id="neb_size" name="neb_size" min="0" max="100" value="30" step="10" style="width: 256px;" />
-          <input type="number" id="neb_size_val" name="neb_size_val" style="width: 40px;" disabled />
-        </div>
-        <label for="neb_blur">Blur Intensity</label>
-        <div class="row">
-          <input type="range" id="neb_blur" name="neb_blur" min="30" max="60" value="30" step="5" style="width: 256px;" />
-          <input type="number" id="neb_blur_val" name="neb_blur_val" style="width: 40px;" disabled />
-        </div>
-        <label for="neb_color1">Color(s)</label>
-        <div class="col">
-          <input type="color" id="neb_color1" name="neb_color1" value="#2f2b63" />
-          <div class="row">
-            <label for="neb_useColor2">Use Secondary Color?</label>
-            <input type="checkbox" id="neb_useColor2" name="neb_useColor2" />
+  a { color: var(--gold); text-decoration: none; border-bottom: 1px solid rgba(231,178,76,0.35); transition: border-color .2s ease, color .2s ease; }
+  a:hover { border-color: var(--gold); }
+  a:focus-visible, button:focus-visible { outline: 2px solid var(--violet); outline-offset: 3px; }
+
+  h1, h2, h3 { font-family: 'Fraunces', Georgia, serif; font-weight: 500; margin: 0; }
+
+  .wrap { max-width: 780px; margin: 0 auto; padding: 0 28px; }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    position: relative;
+    overflow: hidden;
+    padding: 96px 0 84px;
+    background: radial-gradient(ellipse 90% 70% at 50% -10%, #1B1F42 0%, var(--bg) 68%);
+    border-bottom: 1px solid var(--line);
+  }
+  .starfield, .starfield::after {
+    content: "";
+    position: absolute;
+    top: 0; left: 0;
+    width: 2px; height: 2px;
+    border-radius: 50%;
+    box-shadow: 889px 707px rgba(236,232,222,0.47), 642px 893px rgba(236,232,222,0.43), 1047px 236px rgba(236,232,222,0.37), 1180px 389px rgba(236,232,222,0.33), 1451px 893px rgba(236,232,222,0.25), 1102px 403px rgba(236,232,222,0.36), 143px 676px rgba(236,232,222,0.44), 1358px 255px rgba(236,232,222,0.47), 615px 1038px rgba(236,232,222,0.34), 836px 668px rgba(236,232,222,0.37), 605px 1135px rgba(236,232,222,0.29), 861px 776px rgba(236,232,222,0.45), 356px 1165px rgba(236,232,222,0.34), 1122px 0px rgba(236,232,222,0.34), 430px 880px rgba(236,232,222,0.49), 1242px 659px rgba(236,232,222,0.39), 905px 437px rgba(236,232,222,0.4), 1507px 347px rgba(236,232,222,0.45), 581px 1055px rgba(236,232,222,0.45), 1268px 686px rgba(236,232,222,0.28), 1538px 481px rgba(236,232,222,0.45), 460px 407px rgba(236,232,222,0.29), 94px 501px rgba(236,232,222,0.55), 1251px 149px rgba(236,232,222,0.39), 1289px 1178px rgba(236,232,222,0.31), 1426px 786px rgba(236,232,222,0.4), 499px 302px rgba(236,232,222,0.45), 11px 218px rgba(236,232,222,0.48), 448px 360px rgba(236,232,222,0.49), 1425px 1060px rgba(236,232,222,0.39), 1141px 510px rgba(236,232,222,0.53), 248px 934px rgba(236,232,222,0.29), 951px 1087px rgba(236,232,222,0.55), 1219px 649px rgba(236,232,222,0.54), 906px 1033px rgba(236,232,222,0.38), 1122px 913px rgba(236,232,222,0.52), 1523px 972px rgba(236,232,222,0.39), 1539px 506px rgba(236,232,222,0.5), 567px 1067px rgba(236,232,222,0.4), 489px 562px rgba(236,232,222,0.38), 1461px 585px rgba(236,232,222,0.32), 687px 654px rgba(236,232,222,0.52), 165px 283px rgba(236,232,222,0.3), 784px 312px rgba(236,232,222,0.46), 131px 849px rgba(236,232,222,0.37), 1111px 954px rgba(236,232,222,0.37), 423px 860px rgba(236,232,222,0.37), 1576px 1196px rgba(236,232,222,0.53), 40px 1179px rgba(236,232,222,0.36), 12px 720px rgba(236,232,222,0.34), 798px 858px rgba(236,232,222,0.41), 1504px 1118px rgba(236,232,222,0.49), 451px 999px rgba(236,232,222,0.32), 892px 994px rgba(236,232,222,0.26), 688px 828px rgba(236,232,222,0.47), 957px 261px rgba(236,232,222,0.54), 1093px 55px rgba(236,232,222,0.52), 1212px 1155px rgba(236,232,222,0.45), 171px 877px rgba(236,232,222,0.29), 945px 372px rgba(236,232,222,0.27), 776px 670px rgba(236,232,222,0.31), 669px 691px rgba(236,232,222,0.48), 776px 569px rgba(236,232,222,0.48), 863px 516px rgba(236,232,222,0.5), 963px 39px rgba(236,232,222,0.47), 106px 716px rgba(236,232,222,0.32), 140px 82px rgba(236,232,222,0.48), 506px 408px rgba(236,232,222,0.5), 1272px 312px rgba(236,232,222,0.32), 969px 234px rgba(236,232,222,0.42), 446px 952px rgba(236,232,222,0.46), 1570px 755px rgba(236,232,222,0.3), 1243px 234px rgba(236,232,222,0.48), 335px 637px rgba(236,232,222,0.28), 52px 638px rgba(236,232,222,0.42), 768px 812px rgba(236,232,222,0.53), 406px 155px rgba(236,232,222,0.43), 1284px 497px rgba(236,232,222,0.28), 1582px 617px rgba(236,232,222,0.51), 1229px 247px rgba(236,232,222,0.49), 1159px 84px rgba(236,232,222,0.35), 877px 758px rgba(236,232,222,0.27), 1326px 698px rgba(236,232,222,0.25), 860px 1003px rgba(236,232,222,0.28), 741px 941px rgba(236,232,222,0.46), 891px 360px rgba(236,232,222,0.47), 1332px 553px rgba(236,232,222,0.43), 1102px 990px rgba(236,232,222,0.39), 1497px 549px rgba(236,232,222,0.35), 502px 177px rgba(236,232,222,0.33), 923px 499px rgba(236,232,222,0.48), 1167px 776px rgba(236,232,222,0.35), 1012px 665px rgba(236,232,222,0.3), 434px 726px rgba(236,232,222,0.49), 697px 572px rgba(236,232,222,0.51), 1436px 565px rgba(236,232,222,0.42), 1058px 391px rgba(236,232,222,0.28), 1474px 832px rgba(236,232,222,0.4), 1552px 492px rgba(236,232,222,0.46), 1322px 1005px rgba(236,232,222,0.38), 35px 190px rgba(236,232,222,0.34), 828px 498px rgba(236,232,222,0.34), 1191px 755px rgba(236,232,222,0.39), 1087px 704px rgba(236,232,222,0.38), 1527px 1127px rgba(236,232,222,0.35), 1439px 929px rgba(236,232,222,0.33), 514px 472px rgba(236,232,222,0.29), 394px 646px rgba(236,232,222,0.29), 1097px 379px rgba(236,232,222,0.31), 1512px 991px rgba(236,232,222,0.33), 1207px 1074px rgba(236,232,222,0.43), 205px 397px rgba(236,232,222,0.34), 739px 367px rgba(236,232,222,0.34), 1450px 1093px rgba(236,232,222,0.29), 93px 111px rgba(236,232,222,0.42), 1428px 258px rgba(236,232,222,0.44), 1541px 1005px rgba(236,232,222,0.28), 25px 1175px rgba(236,232,222,0.34), 980px 902px rgba(236,232,222,0.35), 105px 517px rgba(236,232,222,0.53), 978px 233px rgba(236,232,222,0.5), 820px 1007px rgba(236,232,222,0.27), 1289px 109px rgba(236,232,222,0.3), 1152px 622px rgba(236,232,222,0.28), 508px 242px rgba(236,232,222,0.42), 852px 462px rgba(236,232,222,0.48), 779px 922px rgba(236,232,222,0.52), 608px 878px rgba(236,232,222,0.34), 1271px 123px rgba(236,232,222,0.43), 1515px 203px rgba(236,232,222,0.53), 425px 432px rgba(236,232,222,0.33), 166px 321px rgba(236,232,222,0.32), 1130px 153px rgba(236,232,222,0.3), 836px 922px rgba(236,232,222,0.46), 962px 596px rgba(236,232,222,0.26), 590px 579px rgba(236,232,222,0.46), 929px 145px rgba(236,232,222,0.46), 541px 405px rgba(236,232,222,0.38), 1115px 460px rgba(236,232,222,0.44), 544px 291px rgba(236,232,222,0.27);
+  }
+  .starfield::after {
+    box-shadow: 339px 629px rgba(236,232,222,0.74), 1165px 591px rgba(236,232,222,0.68), 959px 622px rgba(236,232,222,0.78), 557px 1024px rgba(236,232,222,0.72), 896px 164px rgba(236,232,222,0.74), 884px 660px rgba(236,232,222,0.74), 52px 187px rgba(236,232,222,0.59), 1380px 1178px rgba(236,232,222,0.73), 42px 551px rgba(236,232,222,0.73), 1562px 358px rgba(236,232,222,0.69), 1334px 905px rgba(236,232,222,0.87), 371px 1198px rgba(236,232,222,0.67), 1007px 186px rgba(236,232,222,0.69), 836px 682px rgba(236,232,222,0.63), 214px 329px rgba(236,232,222,0.63), 1420px 1014px rgba(236,232,222,0.62), 820px 1126px rgba(236,232,222,0.51), 180px 644px rgba(236,232,222,0.6), 237px 827px rgba(236,232,222,0.85), 2px 1111px rgba(236,232,222,0.68), 111px 384px rgba(236,232,222,0.71), 1275px 1020px rgba(236,232,222,0.75), 1556px 105px rgba(236,232,222,0.58), 1124px 268px rgba(236,232,222,0.87), 897px 992px rgba(236,232,222,0.55), 1290px 490px rgba(236,232,222,0.78), 636px 1128px rgba(236,232,222,0.51), 835px 190px rgba(236,232,222,0.59), 232px 945px rgba(236,232,222,0.88), 1326px 315px rgba(236,232,222,0.7), 1467px 597px rgba(236,232,222,0.7), 559px 850px rgba(236,232,222,0.83), 967px 499px rgba(236,232,222,0.68), 296px 785px rgba(236,232,222,0.58), 1227px 1040px rgba(236,232,222,0.8), 279px 142px rgba(236,232,222,0.61), 849px 696px rgba(236,232,222,0.87), 1039px 547px rgba(236,232,222,0.83), 579px 611px rgba(236,232,222,0.83), 1187px 1002px rgba(236,232,222,0.85), 914px 1103px rgba(236,232,222,0.69), 680px 1130px rgba(236,232,222,0.81), 772px 932px rgba(236,232,222,0.87), 386px 489px rgba(236,232,222,0.73), 478px 841px rgba(236,232,222,0.52), 1525px 968px rgba(236,232,222,0.78), 780px 790px rgba(236,232,222,0.9), 1335px 311px rgba(236,232,222,0.7), 75px 258px rgba(236,232,222,0.7), 1208px 679px rgba(236,232,222,0.85);
+    width: 2.5px; height: 2.5px;
+  }
+  .starfield { animation: twinkle 7s ease-in-out infinite alternate; }
+  @keyframes twinkle { from { opacity: 1; } to { opacity: .55; } }
+  @media (prefers-reduced-motion: reduce) { .starfield { animation: none; } }
+
+  .hero-inner { position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 26px; }
+
+  .portrait-ring {
+    width: 156px; height: 156px;
+    border-radius: 50%;
+    padding: 4px;
+    background: conic-gradient(from 200deg, var(--gold), var(--violet), var(--gold));
+  }
+  .portrait {
+    width: 100%; height: 100%;
+    border-radius: 50%;
+    background: var(--bg-raised);
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+    border: 3px solid var(--bg);
+  }
+  .portrait img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .portrait .placeholder-mark { font-family: 'Fraunces', serif; font-size: 15px; color: var(--text-faint); letter-spacing: .02em; }
+
+  .kicker { font-family: 'Fraunces', serif; font-style: italic; font-weight: 400; font-size: 18px; color: var(--violet); }
+  .name { font-size: clamp(40px, 8vw, 64px); line-height: 1.05; letter-spacing: -0.01em; }
+  .role { max-width: 46ch; color: var(--text-muted); font-size: 18px; }
+  .role a { color: var(--text-muted); border-color: var(--line-strong); }
+  .role a:hover { color: var(--gold); border-color: var(--gold); }
+
+  /* ---------- Sections ---------- */
+  section.block { padding: 68px 0; border-bottom: 1px solid var(--line); }
+  section.block:last-of-type { border-bottom: none; }
+
+  .section-head { display: grid; grid-template-columns: 150px 1fr; gap: 32px; align-items: start; }
+  .section-head h2 { font-size: 28px; }
+  @media (max-width: 620px) {
+    .section-head { grid-template-columns: 1fr; gap: 14px; }
+  }
+
+  .about p { max-width: 62ch; color: var(--text); }
+  .about p + p { margin-top: 16px; }
+
+  /* Education */
+  .edu-list { display: flex; flex-direction: column; gap: 22px; }
+  .edu-item { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; border-top: 1px solid var(--line); padding-top: 18px; }
+  .edu-item:first-child { border-top: none; padding-top: 0; }
+  .edu-main .degree { font-family: 'Fraunces', serif; font-size: 19px; }
+  .edu-main .school { color: var(--text-muted); margin-top: 2px; }
+  .edu-when { font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--text-faint); white-space: nowrap; padding-top: 3px; }
+
+  /* ---------- Projects ---------- */
+  .projects-head { padding-bottom: 8px; }
+  .project {
+    padding: 56px 0;
+    border-top: 1px solid var(--line);
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 44px;
+    align-items: center;
+  }
+  .project:first-of-type { border-top: none; }
+  .project.flip .figure { order: 2; }
+  .project.flip .copy { order: 1; }
+  @media (max-width: 700px) {
+    .project { grid-template-columns: 1fr; }
+    .project.flip .figure, .project.flip .copy { order: initial; }
+  }
+
+  .proj-tag { font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: var(--text-faint); }
+  .proj-title { font-size: 27px; margin-top: 6px; margin-bottom: 14px; }
+  .proj-desc { color: var(--text-muted); max-width: 46ch; }
+  .proj-link { display: inline-flex; align-items: center; gap: 8px; margin-top: 18px; font-family: 'IBM Plex Mono', monospace; font-size: 14px; }
+
+  .figure { position: relative; border-radius: 4px; overflow: hidden; background: var(--bg-card); border: 1px solid var(--line); min-height: 200px; display: flex; align-items: center; justify-content: center; }
+
+  /* MoveMaster motif: layered offset frames suggesting motion */
+  .motif-move { width: 100%; aspect-ratio: 4/3; position: relative; }
+  .motif-move span { position: absolute; border: 1.5px solid var(--line-strong); border-radius: 3px; }
+  .motif-move span:nth-child(1) { width: 62%; height: 46%; top: 18%; left: 8%; }
+  .motif-move span:nth-child(2) { width: 62%; height: 46%; top: 30%; left: 20%; border-color: rgba(156,140,224,0.45); }
+  .motif-move span:nth-child(3) { width: 62%; height: 46%; top: 42%; left: 32%; border-color: rgba(231,178,76,0.6); }
+
+  /* Half-Machine motif: sierpinski triangle */
+  .figure.dark { background: #0A0B1C; }
+  .motif-sierpinski { width: 70%; height: auto; }
+  .motif-sierpinski path { fill: none; }
+
+  /* Galaxy motif */
+  .motif-galaxy {
+    width: 100%; aspect-ratio: 4/3;
+    background:
+      radial-gradient(1.5px 1.5px at 20% 30%, #fff, transparent),
+      radial-gradient(1.5px 1.5px at 70% 60%, #fff, transparent),
+      radial-gradient(1px 1px at 40% 80%, #fff, transparent),
+      radial-gradient(1px 1px at 85% 20%, #fff, transparent),
+      radial-gradient(1px 1px at 55% 15%, #fff, transparent),
+      radial-gradient(1.5px 1.5px at 10% 70%, #fff, transparent),
+      radial-gradient(90px 60px at 60% 45%, rgba(156,140,224,0.55), transparent 70%),
+      radial-gradient(70px 90px at 35% 55%, rgba(231,178,76,0.35), transparent 70%);
+  }
+
+  /* Funbotics motif: simple circuit */
+  .motif-circuit { width: 72%; height: auto; }
+  .motif-circuit circle { fill: var(--gold); }
+  .motif-circuit path { fill: none; stroke: var(--line-strong); stroke-width: 1.5; }
+
+  .video-embed { position: relative; width: 100%; aspect-ratio: 16/9; background: #000; }
+  .video-embed iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+  /* ---------- Footer ---------- */
+  footer { padding: 44px 0 64px; text-align: center; color: var(--text-faint); font-size: 14px; }
+  footer .name-sm { font-family: 'Fraunces', serif; font-style: italic; color: var(--text-muted); }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="starfield" aria-hidden="true"></div>
+  <div class="wrap hero-inner">
+    <div class="portrait-ring">
+      <div class="portrait">
+        <img src="hs.png" alt="Katrina Mosquera-Maykovych">
+      </div>
+    </div>
+    <div>
+      <h1 class="name">Katrina Mosquera-Maykovych</h1>
+    </div>
+    <p class="role">I like to code, build robots, and make music.</p>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="block about" id="about">
+    <div class="section-head">
+      <h2>About</h2>
+      <div>
+        <p>Hi, my name is Katrina! I'm a graduate Computer Science student at Rensselaer Polytechnic Institute. I have taken an interest in a number of different areas of Computer Science, including open-source research, robotics education, and procedurally-generated art.
+        <p>Thank you for taking the time!</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="education">
+    <div class="section-head">
+      <h2>Education</h2>
+      <div class="edu-list">
+        <div class="edu-item">
+          <div class="edu-main">
+            <div class="degree">B.S., Computer Science</div>
+            <div class="school">Rensselaer Polytechnic Institute</div>
           </div>
-          <input type="color" id="neb_color2" name="neb_color2" value="#a3541c" disabled />
+          <div class="edu-when">2022 &ndash; 2026</div>
         </div>
-        <label for="neb_density" style="padding-top: 5px;">Density</label>
-        <div class="row">
-          <input type="range" id="neb_density" name="neb_density" min="0" max="10" value="4" step="1" style="width: 256px;" />
-          <input type="number" id="neb_density_val" name="neb_density_val" style="width: 40px;" disabled />
+        <div class="edu-item">
+          <div class="edu-main">
+            <div class="degree">M.S., Computer Science</div>
+            <div class="school">Rensselaer Polytechnic Institute</div>
+          </div>
+          <div class="edu-when">IN PROGRESS</div>
         </div>
       </div>
-    
-      
+    </div>
+  </section>
+
+  <section class="block" id="projects">
+    <div class="section-head projects-head">
+      <h2>Projects</h2>
+      <p class="proj-desc" style="margin:0;">A selection of things I've made recently.</p>
     </div>
 
-    <script src="util.js"></script>
-  </body>
+    <div class="project">
+      <div class="copy">
+        <div class="proj-tag">01 &mdash; PROGRAM / ML</div>
+        <h3 class="proj-title">MoveMaster</h3>
+        <p class="proj-desc">An open-source reinforcement learning project focused on Jenga, aiming to train an agent capable of making optimal moves. Includes a game-state visualizer for understanding tower configurations, a Python-based game-state generator that simulates valid games through sequences of block transformations, and a Unity simulator that accurately detects game-ending moves.</p>
+        <a class="proj-link" href="https://move-master.github.io/" target="_blank" rel="noopener">Visit MoveMaster &rarr;</a>
+      </div>
+      <img src="https://move-master.github.io/resources/mm-icon.png" width="250">
+    </div>
+
+    <div class="project flip">
+      <div class="copy">
+        <div class="proj-tag">02 &mdash; SOUND / GENERATIVE</div>
+        <h3 class="proj-title">Half&#8211;Machine</h3>
+        <p class="proj-desc">An experimental track that sonifies the Sierpi&#324;ski triangle, translating its recursive fractal geometry into sound through image-to-audio synthesis. The piece traces a shift from human to machine perspective, and the structure reinforces the idea throughout: a spectrogram of the audio reproduces the triangle itself, and the MIDI sequence and intro/outro were built with palindromic symmetry so the track loops perfectly.</p>
+      </div>
+      <div class="copy" style="grid-column: 1 / -1;">
+        <div class="video-embed" style="margin-top:6px; border-radius:4px; overflow:hidden;">
+          <iframe src="https://www.youtube.com/embed/pkgjz6zyzFM" title="Half-Machine" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="project">
+      <div class="copy">
+        <div class="proj-tag">03 &mdash; WEB APP / TOOL</div>
+        <h3 class="proj-title">Parametrized Galaxy Generator</h3>
+        <p class="proj-desc">A procedural image generator that produces customizable galaxy scenes: stars with variable shape, size, and color; nebulae with adjustable density, size, and color; and solid or gradient backdrops. Built to solve a recurring need for original galaxy textures, used in social content at Funbotics and as game-ready skyboxes for personal projects.</p>
+        <a class="proj-link" href="https://kaalmoma.github.io/" target="_blank" rel="noopener">Try the generator &rarr;</a>
+      </div>
+      <img src="galaxygif.gif" width="250">
+    </div>
+
+    <div class="project flip">
+      <div class="copy">
+        <div class="proj-tag">04 &mdash; EDUCATION / ROBOTICS</div>
+        <h3 class="proj-title">Funbotics</h3>
+        <p class="proj-desc">A robotics curriculum introducing students to the fundamentals of computer science and robotics through assembling and programming their own robots.</p>
+        <a class="proj-link" href="https://funbotics.gitbook.io/fbx-tech/bsnLGQrNpD4bl3IAlCkT" target="_blank" rel="noopener">View the curriculum &rarr;</a>
+      </div>
+      <img src="bulb.webp" width="250">
+    </div>
+
+  </section>
+
+</main>
+
+<footer>
+  <div class="name-sm">Katrina Mosquera-Maykovych</div>
+</footer>
+
+</body>
 </html>
